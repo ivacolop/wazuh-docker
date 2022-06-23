@@ -1,0 +1,9 @@
+#!/usr/bin/with-contenv bash
+# Wazuh App Copyright (C) 2017, Wazuh Inc. (License GPLv2)
+
+set -e
+
+if [ "$INDEX_PREFIX" != "" ]; then
+  >&2 echo "Customize Elasticsearch index prefix"
+  sed -i "s|default: wazuh-alerts-4.x-|default: $INDEX_PREFIX|g" /usr/share/filebeat/module/wazuh/alerts/manifest.yml
+fi

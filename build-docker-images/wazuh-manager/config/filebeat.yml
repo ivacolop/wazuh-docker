@@ -7,6 +7,36 @@ filebeat.modules:
     archives:
       enabled: false
 
+processors:
+  - copy_fields:
+      fields:
+        - from: message
+          to: original_message
+      fail_on_error: false
+      ignore_missing: true
+
+  - decode_json_fields:
+      fields: ["original_message"]
+      add_error_key: false
+  - dns:
+      type: reverse
+      action: append
+      transport: udp
+      fields:
+        original_message.data.srcip: src_hostname
+      success_cache:
+        capacity.initial: 1000
+        capacity.max: 10000
+        min_ttl: 1m
+      failure_cache:
+        capacity.initial: 1000
+        capacity.max: 10000
+        ttl: 1m
+      timeout: 500ms
+  - drop_fields:
+      fields: ["original_message"]
+      ignore_missing: true
+
 setup.template.json.enabled: true
 setup.template.json.path: '/etc/filebeat/wazuh-template.json'
 setup.template.json.name: 'wazuh'
